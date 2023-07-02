@@ -72,7 +72,6 @@ export default function markerPage() {
                     Login with Discord
                 </button> */}
                 <p>{diceresult}</p>
-                <DiscordLoginButton></DiscordLoginButton>
 
             </div>
         </div>
