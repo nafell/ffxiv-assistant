@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl= env("DIRECT_URL")
+}
+
+
+// =======================
+// Discord Schedule Sender
+// =======================
+model Team {
+  id        Int       @id @default(autoincrement())
+  name      String
+  weekSchedules   WeekSchedule[]
+  discordChannels DiscordChannel[]
+  discordGuildId   BigInt
+  sheetScheduleUrl  String?
+  sheetscheduleSheetName  String?
+  sheetSchedules    SheetSchedule[]
+}
+
+model SheetSchedule {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  canParticipate ParticipationPossibility
+  updatedAt DateTime  @updatedAt
+  member    FfxivRole
+  team      Team      @relation(fields: [teamId], references: [id])
+  teamId    Int
+}
+enum FfxivRole {
+  MT
+  ST
+  PH
+  BH
+  D1
+  D2
+  D3
+  D4
+}
+enum ParticipationPossibility {
+  able
+  conditional
+  unable
+  unentered
+}
+
+model WeekSchedule {
+  id        Int       @id @default(autoincrement())
+  firstDay  DateTime
+  appointments Appointment[]
+  team      Team    @relation(fields: [teamId], references: [id])
+  teamId    Int
+  discordMessages DiscordMessage[]
+}
+
+model Appointment {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  timeSlot  TimeSlot
+  startTime DateTime
+  endTime   DateTime?
+  objective String?
+  note      String?
+  isScheduled Boolean
+  isCancelled Boolean
+
+  weekSchedule    WeekSchedule @relation(fields: [weekScheduleId], references: [id])
+  weekScheduleId  Int
+}
+enum TimeSlot {
+  Morning
+  AM
+  Noon
+  Afternoon
+  Evening
+  Night
+  Midnight
+}
+
+model DiscordChannel {
+  id         BigInt      @id
+  name       String
+  webhookUrl String
+  teams      Team[]
+  discordMessages DiscordMessage[]
+}
+
+model DiscordMessage {
+  id        BigInt       @id
+  weekSchedule    WeekSchedule @relation(fields: [weekScheduleId], references: [id])
+  weekScheduleId  Int
+  discordChannel    DiscordChannel @relation(fields: [discordChannelId], references: [id])
+  discordChannelId  BigInt
+}

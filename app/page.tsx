@@ -4,6 +4,7 @@ import Link from 'next/link'
 import LogoutButton from '../components/LogoutButton'
 import SupabaseLogo from '../components/SupabaseLogo'
 import NextJsLogo from '../components/NextJsLogo'
+import LoginButton from '@/components/LoginButton'
 
 const resources = [
   {
@@ -52,6 +53,17 @@ export default async function Index() {
           <div />
           <div>
             {user ? (
+              <LogoutButton />
+            ) : (
+              <LoginButton redirectPath='/' />
+            )}
+          </div>
+        </div>
+        
+        {/* <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm text-foreground">
+          <div />
+          <div>
+            {user ? (
               <div className="flex items-center gap-4">
                 Hey, {user.email}!
                 <LogoutButton />
@@ -65,7 +77,7 @@ export default async function Index() {
               </Link>
             )}
           </div>
-        </div>
+        </div> */}
       </nav>
 
       <div className="animate-in flex flex-col gap-14 opacity-0 max-w-4xl px-3 py-16 lg:py-24 text-foreground">

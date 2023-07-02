@@ -15,3 +15,8 @@ export async function middleware(req: NextRequest) {
 
   return res
 }
+
+export { default } from "next-auth/middleware";
+export const config = {
+    matcher: ["/schedule/:path*"]
+}

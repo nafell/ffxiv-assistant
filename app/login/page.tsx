@@ -12,6 +12,8 @@ export default function Login() {
   const router = useRouter()
   const supabase = createClientComponentClient()
 
+
+
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     await supabase.auth.signUp({
