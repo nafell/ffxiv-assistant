@@ -30,8 +30,10 @@ package.json
 ### Setup Prisma
 `npx prisma init --datasource-provider postgresql`  
 .env:  
-  DIRECT_URL=paste url from Supabase -> (open project) -> settings -> Database -> Connection string  
-  DATABASE_URL=(Connection Pooling / Connection String)?pgbouncer=true
+```
+DIRECT_URL=paste url from Supabase -> (open project) -> settings -> Database -> Connection string  
+DATABASE_URL=(Connection Pooling / Connection String)?pgbouncer=true
+```
 fill in [YOUR-PASSWORD]  
 
 schema.prisma:
@@ -42,3 +44,19 @@ define models
 guided by: https://supabase.com/docs/guides/integrations/prisma
 
 `npx prisma migrate dev --name init`  
+
+
+### Google Sheets API
+`npm i googleapis`
+.env:  
+```
+SHEETS_ID=get id from sheet URL
+GOOGLE_APPLICATION_CREDENTIALS=./secrets.json
+```
+.gitignore:  
+```
+#Google Sheets API
+secrets.json
+```
+
+Google Cloud Platform -> APIs and services -> Credentials -> Service Accounts -> Keys -> Add Key -> JSON -> save to project root

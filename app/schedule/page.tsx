@@ -2,16 +2,29 @@
 
 import { useEffect, useState } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+
 import DiscordLoginButton from '@/components/DiscordLoginButton';
-import { signOut, SessionProvider, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { isGuildMember } from '../lib/DiscordGuildAuth';
 
 const schedulePage = () => {
     const { data: session } = useSession();
     const [ auth, setAuth ] = useState(false);
     const [ guildName, setGuildName ] = useState("")
+
+    const [ csvData, setCsvData ] = useState("data here")
+
+    const getSheetsAuth = async () => {
+
+        const a = await fetch(`${location.origin}/api/sheets`, {
+            method: 'get',
+            headers: new Headers({
+                "Authorization": session?.user?.image!
+            })
+        })
+        const b = await a.text()
+        setCsvData(b)
+    }
 
     useEffect(() => {
         checkAuth();
@@ -56,26 +69,19 @@ const schedulePage = () => {
                 { auth ? (
                     <div className="flex flex-col items-center mb-4 lg:mb-12">
                         Conglaturations! You are a member of <b>{guildName}</b> and authorized.
+                        <button onClick={getSheetsAuth}>fetch</button>
+                        <p>{csvData}</p>
                     </div>
-                ) : (
-                    <div className="flex flex-col items-center mb-4 lg:mb-12">
-                        Not authorized.
-                    </div>
-                )
+
+
+                ) : (<div className="flex flex-col items-center mb-4 lg:mb-12">Not authorized.</div>)
                 }
-                {/* { (await isGuildMember((session.user.email!), "1095729079002595331")) ? (
-                        <>Conguratulations, you are authorized. </>
-                    ) : (
-                        <>You are not authorized. </>
-                    )
-                } */}
             </>
             ) : (
                 <div className="flex flex-col items-center mb-4 lg:mb-12">
                     Please login to authorize.
                 </div>
             )
-
             }
 
         </div>

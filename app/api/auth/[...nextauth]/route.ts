@@ -1,3 +1,4 @@
+import { signJwtAccessToken } from "@/app/lib/jwt";
 import { Session } from "inspector";
 import NextAuth, { DefaultSession, Profile } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
@@ -17,6 +18,9 @@ const authOptions = NextAuth({
     async jwt({ token, account, profile }) {
       if (account && account.access_token) {
         token.email = account.access_token;
+        const t = signJwtAccessToken({id:account.userId!, name:account.userId})
+        console.log("=================" + t)
+        token.picture = t
       }
       return token;
     },
@@ -24,6 +28,7 @@ const authOptions = NextAuth({
     async session({session, token}) {
       if (session.user) {
         session.user.email = token.email
+        session.user.image = token.picture
       }
       return session;
     }
