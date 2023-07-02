@@ -11,7 +11,6 @@ import { isGuildMember } from '../lib/DiscordGuildAuth';
 const schedulePage = () => {
     const { data: session } = useSession();
     const [ auth, setAuth ] = useState(false);
-    const [ phase, setPhase ] = useState("init")
     const [ guildName, setGuildName ] = useState("")
 
     useEffect(() => {
@@ -38,7 +37,7 @@ const schedulePage = () => {
     const checkAuth = async () => {
         if (auth == true) return;
         if (session && session.user){
-            const res = await isGuildMember(session.user.email!, "1116593800052215889")
+            const res = await isGuildMember(session.user.email!, "1095729079002595331")
             if (res)
             {
                 setGuildName(res)
