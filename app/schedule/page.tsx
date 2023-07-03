@@ -26,6 +26,10 @@ const schedulePage = () => {
         setCsvData(b)
     }
 
+    const getSpreadSheetSheets = async () => {
+        const a = await fetch(`${location.origin}/api/sheets/12345/sheets/`)
+    }
+
     useEffect(() => {
         checkAuth();
     })

@@ -1,3 +1,5 @@
+import prisma from "./prisma";
+
 export async function isGuildMember(accessToken: string, guildId:string): Promise<string | null> {
     const res: Response = await fetch("https://discordapp.com/api/users/@me/guilds", {
         headers: {
@@ -17,6 +19,24 @@ export async function isGuildMember(accessToken: string, guildId:string): Promis
     
     console.log("=====================ng")
     return null
+}
+
+export async function isTeamMember(accessToken: string, teamId:number): Promise<string | null> {
+    //get guild id from prisma
+    //call isGuildMember
+
+    const team = await prisma.team.findFirst({
+        where: {
+            teamId: teamId
+        }
+    })
+
+    if (!team)
+    {
+        return null
+    }
+
+    return await isGuildMember(accessToken, team.guildId)
 }
 
 interface Guild {

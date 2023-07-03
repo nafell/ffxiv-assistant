@@ -43,5 +43,18 @@ export async function GET(request: Request) {
     }
 }
 
-const parseSchedule = async () => {
+const parseSchedule = async (table: string[][]) => {
+    let csv: string = ""
+
+    for (let rows of table) {
+        for (let cell of rows) {
+            csv = csv.concat(cell)
+            csv = csv.concat(",")
+        }
+        csv = csv.concat("\n")
+    }
+
+    console.log(csv)
+
+    return csv
 }
