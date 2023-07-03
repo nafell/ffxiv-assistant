@@ -2,6 +2,7 @@ import { verifyJwt } from '@/lib/jwt';
 import { decryptDiscordToken, isDiscordGuildAuth } from '@/lib/DiscordGuildAuth';
 import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     const discordAuth = await isDiscordGuildAuth(request, params.id)
@@ -16,20 +17,36 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         );
     }
 
-    // if (!params.teamId) {
-    //     return new Response(JSON.stringify({
-    //         error:"bad request",
-    //     }),
-    //     {
-    //         status: 400,
-    //     }
-    //     );
-    // }
-
-    //authorization
+    const teamId = Number(params.id)
+    if (Number.isNaN(teamId))
+    {
+        return new Response(JSON.stringify({
+            error:"Id is not a number.",
+        }),
+        {
+            status: 400,
+        }
+        );
+    }
 
     //get sheetId from prisma
-    const spreadsheetId = process.env.SHEETS_ID
+    const team = await prisma.team.findFirst({
+        where: {
+            id: teamId
+        }
+    })
+    const spreadsheetId = team?.sheetScheduleUrl
+
+    if (!spreadsheetId)
+    {
+        return new Response(JSON.stringify({
+            error:"spreadsheet id is not set for this team.",
+        }),
+        {
+            status: 400,
+        }
+        );
+    }
 
     const sheetsAuth = await google.auth.getClient({ scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"] })
     const sheets = google.sheets({ version: "v4", auth: sheetsAuth })

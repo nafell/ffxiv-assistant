@@ -10,7 +10,6 @@ export async function isGuildMember(accessToken: string, guildId:string): Promis
     });
   
     if (res.ok) {
-        console.log("=====================ok")
         const guilds: Guild[] = await res.json();
         const result = guilds.some((guild: Guild) => guild.id === guildId)
         if (!result)
@@ -19,7 +18,6 @@ export async function isGuildMember(accessToken: string, guildId:string): Promis
         return guildName!
     }
     
-    console.log("=====================ng")
     return null
 }
 
