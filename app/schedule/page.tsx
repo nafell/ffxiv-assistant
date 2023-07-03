@@ -14,7 +14,7 @@ const schedulePage = () => {
 
     const [ csvData, setCsvData ] = useState("data here")
 
-    const getSheetsAuth = async () => {
+    const getSheetsInfo = async () => {
 
         const a = await fetch(`${location.origin}/api/sheets`, {
             method: 'get',
@@ -69,7 +69,7 @@ const schedulePage = () => {
                 { auth ? (
                     <div className="flex flex-col items-center mb-4 lg:mb-12">
                         Conglaturations! You are a member of <b>{guildName}</b> and authorized.
-                        <button onClick={getSheetsAuth}>fetch</button>
+                        <button onClick={getSheetsInfo}>fetch</button>
                         <p>{csvData}</p>
                     </div>
 
