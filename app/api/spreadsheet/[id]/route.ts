@@ -1,9 +1,12 @@
-import { verifyJwt } from '@/app/lib/jwt';
+import { verifyJwt } from '@/lib/jwt';
+import { decryptDiscordToken, isDiscordGuildAuth } from '@/lib/DiscordGuildAuth';
 import { google } from 'googleapis';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const accessToken = request.headers.get("authorization");
-    if (!accessToken || !verifyJwt(accessToken)){
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    const discordAuth = await isDiscordGuildAuth(request, params.id)
+
+    if (!discordAuth){
         return new Response(JSON.stringify({
             error:"unauthorized",
         }),
@@ -12,6 +15,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         }
         );
     }
+
     // if (!params.teamId) {
     //     return new Response(JSON.stringify({
     //         error:"bad request",

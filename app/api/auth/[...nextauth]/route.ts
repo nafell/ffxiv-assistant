@@ -1,4 +1,4 @@
-import { signJwtAccessToken } from "@/app/lib/jwt";
+import { signJwtAccessToken } from "@/lib/jwt";
 import { Session } from "inspector";
 import NextAuth, { DefaultSession, Profile } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";

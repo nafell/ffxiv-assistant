@@ -5,12 +5,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
 import { useSession } from 'next-auth/react';
-import { isGuildMember } from '../lib/DiscordGuildAuth';
+import { isGuildMember } from '@/lib/DiscordGuildAuth';
 
 const schedulePage = () => {
     const { data: session } = useSession();
     const [ auth, setAuth ] = useState(false);
-    const [ guildName, setGuildName ] = useState("")
+    const [ guildName, setGuildName ] = useState("encryption")
 
     const [ csvData, setCsvData ] = useState("data here")
 
