@@ -4,6 +4,8 @@ import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+// GET api/spreadsheet/[id]/sheetinfos
+// returns {sheetId, name} of every sheet in the team's spreadsheet
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     const discordAuth = await isDiscordGuildAuth(request, params.id)
 

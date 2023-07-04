@@ -3,6 +3,7 @@ import { isDiscordGuildAuth } from "@/lib/DiscordGuildAuth";
 import { google } from "googleapis";
 import { NextRequest } from "next/server";
 
+// GET api/spreadsheet/[id]/sheetschedule
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     const discordAuth = await isDiscordGuildAuth(request, params.id)
 
