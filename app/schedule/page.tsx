@@ -5,20 +5,20 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
 import { useSession } from 'next-auth/react';
-import { isGuildMember } from '@/lib/DiscordGuildAuth';
+import CryptoES from 'crypto-es';
 
 const schedulePage = () => {
     const { data: session } = useSession();
     const [ auth, setAuth ] = useState(false);
-    const [ guildName, setGuildName ] = useState("encryption")
+    const [ guildName, setGuildName ] = useState("guild Name Here")
 
     const [ csvData, setCsvData ] = useState("data here")
 
     const getSpreadsheetInfo = async () => {
-        const a = await fetch(`${location.origin}/api/spreadsheet/1`, {
+        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetinfos`, {
             method: 'get',
             headers: new Headers({
-                "Authorization": session?.user?.image!
+                "discordToken": session?.user?.image!
             })
         })
         const b = await a.text()
@@ -26,7 +26,7 @@ const schedulePage = () => {
     }
 
     const getSpreadSheetSheets = async () => {
-        const a = await fetch(`${location.origin}/api/sheets/12345/sheets/`)
+        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`)
     }
 
     useEffect(() => {
@@ -53,10 +53,19 @@ const schedulePage = () => {
     const checkAuth = async () => {
         if (auth == true) return;
         if (session && session.user){
-            const res = await isGuildMember(session.user.email!, "1095729079002595331")
-            if (res)
+            // const res = await isGuildMember(session.user.email!, "1095729079002595331")
+            const token = CryptoES.AES.encrypt(session.user.email!, process.env.CRYPTO_KEY).toString()
+
+            const res = await fetch(`${location.origin}/api/auth/discordguild/1/`, {
+                method: 'get',
+                headers: new Headers({
+                    "discordToken": token
+                })
+            })
+
+            if (res.status == 200)
             {
-                setGuildName(res)
+                setGuildName("ログイン成功")
                 setAuth(true)
             }
         }
