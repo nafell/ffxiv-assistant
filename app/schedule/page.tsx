@@ -6,7 +6,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import DiscordLoginButton from '@/components/DiscordLoginButton';
 import { useSession } from 'next-auth/react';
 
-import { encryptDiscordToken } from '@/lib/DiscordTokenEncryption';
+import { encryptDiscordToken } from '@/lib/Discord/DiscordTokenEncryption';
 
 const schedulePage = () => {
     const { data: session } = useSession();

@@ -1,4 +1,4 @@
-import { isDiscordGuildAuth, isGuildMember } from "@/lib/DiscordGuildAuth";
+import { isDiscordGuildAuth, isGuildMember } from "@/lib/Discord/DiscordGuildAuth";
 import { NextRequest, NextResponse } from "next/server";
 
 
