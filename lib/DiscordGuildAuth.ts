@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import CryptoES from "crypto-es";
 import { NextRequest } from "next/server";
+import { decryptDiscordToken } from "./DiscordTokenEncryption";
 
 export async function isGuildMember(accessToken: string, guildId:string): Promise<string | null> {
     const res: Response = await fetch("https://discordapp.com/api/users/@me/guilds", {
@@ -39,14 +39,6 @@ export async function isTeamMember(accessToken: string, teamId:number): Promise<
     {
         return true
     } else return false
-}
-
-export function decryptDiscordToken(encryptedToken: string){
-    return CryptoES.AES.decrypt(encryptedToken, process.env.CRYPTO_KEY).toString(CryptoES.enc.Utf8)
-}
-
-export function encryptDiscordToken(rawToken: string) {
-    return CryptoES.AES.encrypt(rawToken, process.env.CRYPTO_KEY)
 }
 
 export async function isDiscordGuildAuth(nextRequest: NextRequest, teamId: string) : Promise<boolean> {
