@@ -5,7 +5,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
 import { useSession } from 'next-auth/react';
-import CryptoES from 'crypto-es';
+
+import { encryptDiscordToken } from '@/lib/DiscordTokenEncryption';
 
 const schedulePage = () => {
     const { data: session } = useSession();
@@ -26,7 +27,12 @@ const schedulePage = () => {
     }
 
     const getSpreadSheetSheets = async () => {
-        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`)
+        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`,{
+            method: 'get',
+            headers: new Headers({
+                "discordToken": session?.user?.image!
+            }) 
+        })
     }
 
     useEffect(() => {
@@ -54,7 +60,7 @@ const schedulePage = () => {
         if (auth == true) return;
         if (session && session.user){
             // const res = await isGuildMember(session.user.email!, "1095729079002595331")
-            const token = CryptoES.AES.encrypt(session.user.email!, process.env.CRYPTO_KEY).toString()
+            const token = encryptDiscordToken(session.user.email!)
 
             const res = await fetch(`${location.origin}/api/auth/discordguild/1/`, {
                 method: 'get',
