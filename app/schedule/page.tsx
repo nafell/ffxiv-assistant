@@ -27,7 +27,12 @@ const schedulePage = () => {
     }
 
     const getSpreadSheetSheets = async () => {
-        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`)
+        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`,{
+            method: 'get',
+            headers: new Headers({
+                "discordToken": session?.user?.image!
+            }) 
+        })
     }
 
     useEffect(() => {
