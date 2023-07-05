@@ -1,8 +1,7 @@
-import { verifyJwt } from '@/lib/jwt';
-import { decryptDiscordToken, isDiscordGuildAuth } from '@/lib/DiscordGuildAuth';
-import { google } from 'googleapis';
+import { isDiscordGuildAuth } from '@/lib/Discord/DiscordGuildAuth';
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSheetsClient } from '@/lib/GoogleSheets/SheetsClient';
 
 // GET api/spreadsheet/[id]/sheetinfos
 // returns {sheetId, name} of every sheet in the team's spreadsheet
@@ -32,11 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     //get sheetId from prisma
-    const team = await prisma.team.findFirst({
-        where: {
-            id: teamId
-        }
-    })
+    const team = await prisma.team.findFirst({where: { id: teamId }})
     const spreadsheetId = team?.sheetScheduleUrl
 
     if (!spreadsheetId)
@@ -50,10 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         );
     }
 
-    const sheetsAuth = await google.auth.getClient({ scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"] })
-    const sheets = google.sheets({ version: "v4", auth: sheetsAuth })
-
-    const response = await sheets.spreadsheets.get({ spreadsheetId })
+    const response = await (await getSheetsClient()).spreadsheets.get({ spreadsheetId })
 
     const sheetInfos:SheetInfo[] = []
     if(response.data.sheets)

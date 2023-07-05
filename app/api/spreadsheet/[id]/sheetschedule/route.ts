@@ -1,5 +1,4 @@
-import { verifyJwt } from "@/lib/jwt";
-import { isDiscordGuildAuth } from "@/lib/DiscordGuildAuth";
+import { isDiscordGuildAuth } from "@/lib/Discord/DiscordGuildAuth";
 import { google } from "googleapis";
 import { NextRequest } from "next/server";
 
