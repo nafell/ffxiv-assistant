@@ -54,16 +54,16 @@ enum ParticipationPossibility {
 }
 
 model WeekSchedule {
-  id        Int       @id @default(autoincrement())
   firstDay  DateTime
   appointments Appointment[]
   team      Team    @relation(fields: [teamId], references: [id])
   teamId    Int
   discordMessages DiscordMessage[]
+
+  @@id([teamId, firstDay])
 }
 
 model Appointment {
-  id        Int       @id @default(autoincrement())
   date      DateTime
   timeSlot  TimeSlot
   startTime DateTime
@@ -73,8 +73,11 @@ model Appointment {
   isScheduled Boolean
   isCancelled Boolean
 
-  weekSchedule    WeekSchedule @relation(fields: [weekScheduleId], references: [id])
-  weekScheduleId  Int
+  weekSchedule    WeekSchedule @relation(fields: [weekScheduleTeamId, weekScheduleFirstDay], references: [teamId, firstDay])
+  weekScheduleTeamId  Int
+  weekScheduleFirstDay DateTime
+
+  @@id([weekScheduleTeamId, weekScheduleFirstDay, date, timeSlot])
 }
 enum TimeSlot {
   Morning
@@ -96,8 +99,9 @@ model DiscordChannel {
 
 model DiscordMessage {
   id        BigInt       @id
-  weekSchedule    WeekSchedule @relation(fields: [weekScheduleId], references: [id])
-  weekScheduleId  Int
+  weekSchedule    WeekSchedule @relation(fields: [weekScheduleTeamId, weekScheduleFirstDay], references: [teamId, firstDay])
+  weekScheduleTeamId  Int
+  weekScheduleFirstDay DateTime
   discordChannel    DiscordChannel @relation(fields: [discordChannelId], references: [id])
   discordChannelId  BigInt
 }

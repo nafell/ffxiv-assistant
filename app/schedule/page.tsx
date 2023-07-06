@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
+import { Appointment, TimeSlot, WeekSchedule } from '@prisma/client';
+import { WeekScheduleWithAppointments } from '../api/schedule/[id]/weekschedule/route';
 
 const schedulePage = () => {
     const { data: session } = useSession();
@@ -30,6 +32,41 @@ const schedulePage = () => {
             headers: new Headers({
                 "discordToken": session?.user?.discordToken!
             }) 
+        })
+    }
+
+    const postWeekSchedule = async () => {
+
+
+        const w:WeekScheduleWithAppointments = {
+            teamId:1,
+            firstDay: new Date(2023,7,4),
+            appointments: []
+        }
+
+        const a:Appointment = {
+            date: new Date(2023,7,4),
+            timeSlot: TimeSlot.Night,
+            startTime: new Date(2023,7,4,21,30,0),
+            endTime: new Date(2023,7,4,23,30,0),
+            objective: "",
+            note: "",
+            isScheduled: true,
+            isCancelled: false,
+
+            weekScheduleTeamId: 1,
+            weekScheduleFirstDay: w.firstDay
+        }
+
+        w.appointments.push(a)
+
+        const res = await fetch(`${location.origin}/api/schedule/1/weekschedule`,{
+            method: 'post',
+            headers: new Headers({
+                "discordToken": session?.user?.discordToken!,
+                "Content-Type": 'application/json'
+            }) ,
+            body: JSON.stringify(w)
         })
     }
 
@@ -84,6 +121,7 @@ const schedulePage = () => {
                         Conglaturations! You are a member of <b>{guildName}</b> and authorized.
                         <button onClick={getSpreadsheetInfo}>getSpreadsheetInfo</button>
                         <button onClick={getSheetsSchedule}>getSheetsSchedule</button>
+                        <button onClick={postWeekSchedule}>postWeekSchedule</button>
                         <p>{csvData}</p>
                     </div>
 

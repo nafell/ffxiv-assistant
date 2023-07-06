@@ -77,11 +77,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     const schedules = parseSchedule(response.data.values, teamId)
-
-    for (let s in schedules){
-        console.log(JSON.stringify(s))
-    }
-
     await upsertSchedules(schedules)
 
     return NextResponse.json(schedules)
