@@ -1,5 +1,5 @@
+import { encryptDiscordToken } from "@/lib/Discord/DiscordTokenEncryption";
 import { signJwtAccessToken } from "@/lib/jwt";
-import { Session } from "inspector";
 import NextAuth, { DefaultSession, Profile } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
@@ -17,18 +17,14 @@ const authOptions = NextAuth({
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account && account.access_token) {
-        token.email = account.access_token;
-        const t = signJwtAccessToken({id:account.userId!, name:account.userId})
-        console.log("=================" + t)
-        token.picture = t
+        token.discordToken = encryptDiscordToken(account.access_token);
       }
       return token;
     },
 
     async session({session, token}) {
       if (session.user) {
-        session.user.email = token.email
-        session.user.image = token.picture
+        session.user.discordToken = token.discordToken
       }
       return session;
     }

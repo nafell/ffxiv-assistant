@@ -1,12 +1,10 @@
 "use client"
 
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
-import { useSession } from 'next-auth/react';
-
-import { encryptDiscordToken } from '@/lib/Discord/DiscordTokenEncryption';
 
 const schedulePage = () => {
     const { data: session } = useSession();
@@ -19,7 +17,7 @@ const schedulePage = () => {
         const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetinfos`, {
             method: 'get',
             headers: new Headers({
-                "discordToken": session?.user?.image!
+                "discordToken": session?.user?.discordToken!
             })
         })
         const b = await a.text()
@@ -30,7 +28,7 @@ const schedulePage = () => {
         const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`,{
             method: 'get',
             headers: new Headers({
-                "discordToken": session?.user?.image!
+                "discordToken": session?.user?.discordToken!
             }) 
         })
     }
@@ -58,24 +56,21 @@ const schedulePage = () => {
 
     const checkAuth = async () => {
         if (auth == true) return;
-        if (session && session.user){
-            // const res = await isGuildMember(session.user.email!, "1095729079002595331")
-            const token = encryptDiscordToken(session.user.email!)
-
-            const res = await fetch(`${location.origin}/api/auth/discordguild/1/`, {
-                method: 'get',
-                headers: new Headers({
-                    "discordToken": token
-                })
-            })
-
-            if (res.status == 200)
-            {
-                setGuildName("ログイン成功")
-                setAuth(true)
-            }
+        if (!session || !session.user){
+            return;
         }
-        else {
+
+        const res = await fetch(`${location.origin}/api/auth/discordguild/1/`, {
+            method: 'get',
+            headers: new Headers({
+                "discordToken": session.user.discordToken
+            })
+        })
+
+        if (res.status == 200)
+        {
+            setGuildName("ログイン成功")
+            setAuth(true)
         }
     }
 
