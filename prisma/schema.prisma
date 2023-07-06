@@ -27,13 +27,14 @@ model Team {
 }
 
 model SheetSchedule {
-  id        Int       @id @default(autoincrement())
   date      DateTime
   canParticipate ParticipationPossibility
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @updatedAt @default(now())
   member    FfxivRole
   team      Team      @relation(fields: [teamId], references: [id])
   teamId    Int
+
+  @@id([teamId, date, member])
 }
 enum FfxivRole {
   MT

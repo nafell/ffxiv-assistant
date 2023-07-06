@@ -24,8 +24,8 @@ const schedulePage = () => {
         setCsvData(b)
     }
 
-    const getSpreadSheetSheets = async () => {
-        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule`,{
+    const getSheetsSchedule = async () => {
+        const a = await fetch(`${location.origin}/api/spreadsheet/1/sheetschedule?sheet=日程`,{
             method: 'get',
             headers: new Headers({
                 "discordToken": session?.user?.discordToken!
@@ -82,7 +82,8 @@ const schedulePage = () => {
                 { auth ? (
                     <div className="flex flex-col items-center mb-4 lg:mb-12">
                         Conglaturations! You are a member of <b>{guildName}</b> and authorized.
-                        <button onClick={getSpreadsheetInfo}>fetch</button>
+                        <button onClick={getSpreadsheetInfo}>getSpreadsheetInfo</button>
+                        <button onClick={getSheetsSchedule}>getSheetsSchedule</button>
                         <p>{csvData}</p>
                     </div>
 
