@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (Number.isNaN(teamId) || !firstDayDate)
     {
         return new Response(JSON.stringify({
-            error:"Id is not a number.",
+            error:"URL is invalid.",
         }),
         {
             status: 400,
@@ -33,6 +33,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         where: {
             teamId,
             firstDay: firstDayDate
+        },
+        include: {
+            appointments: true
         }
     })
 
@@ -46,14 +49,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         );
     }
 
-    const appointments = await prisma.appointment.findMany({
-        where: { weekSchedule }
-    })
-
-    return {
-        ...weekSchedule,
-        appointments
-    }
+    return NextResponse.json(weekSchedule)
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
