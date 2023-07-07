@@ -1,10 +1,9 @@
 import { isDiscordGuildAuth } from "@/lib/Discord/DiscordGuildAuth";
 import prisma from "@/lib/prisma";
 import { Appointment, WeekSchedule } from "@prisma/client";
-import { NextApiRequest } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string, firstDay: string } }) {
     const discordAuth = await isDiscordGuildAuth(request, params.id)
 
     if (!discordAuth){
@@ -18,7 +17,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     const teamId = Number(params.id)
-    if (Number.isNaN(teamId))
+    const firstDayDate = new Date(Date.parse(params.firstDay))
+    if (Number.isNaN(teamId) || !firstDayDate)
     {
         return new Response(JSON.stringify({
             error:"Id is not a number.",
@@ -29,29 +29,31 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         );
     }
 
-    const {searchParams} = request.nextUrl
-    const firstDayString = searchParams.get("firstDay")
-    if (!firstDayString)
-    {
+    const weekSchedule = await prisma.weekSchedule.findFirst({
+        where: {
+            teamId,
+            firstDay: firstDayDate
+        }
+    })
+
+    if (!weekSchedule){
         return new Response(JSON.stringify({
-            error:"url parameter \"firstDay\" is required",
+            error:"Could not find the specified WeekSchedule in the database",
         }),
         {
-            status: 400,
+            status: 404,
         }
         );
     }
 
-    const firstDay = new Date(firstDayString)
-
-    const weekSchedule = await prisma.weekSchedule.findFirst({
-        where: {
-            teamId,
-            firstDay
-        }
+    const appointments = await prisma.appointment.findMany({
+        where: { weekSchedule }
     })
 
-    return weekSchedule
+    return {
+        ...weekSchedule,
+        appointments
+    }
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
@@ -92,37 +94,42 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     const {appointments, ...weekScheduleOnly} = weekSchedule
 
-    const result = await prisma.weekSchedule.upsert({
-        where: {
-            teamId_firstDay: {
-                teamId,
-                firstDay:weekSchedule.firstDay
+    const appointmentsQuery = appointments.map(appointment => (
+        prisma.appointment.upsert({
+            where: {
+                weekScheduleTeamId_weekScheduleFirstDay_date_timeSlot: {
+                    weekScheduleTeamId: teamId,
+                    weekScheduleFirstDay: weekSchedule.firstDay,
+                    date:appointment.date,
+                    timeSlot:appointment.timeSlot
+                }
+            },
+            update: {
+                ...appointment
+            },
+            create: {
+                ...appointment
             }
-        },
-        update: {
-            ...weekScheduleOnly
-        },
-        create: {
-            ...weekScheduleOnly
-        }
-    })
+        })
+    ))
 
-    const aresult = await prisma.appointment.upsert({
-        where: {
-            weekScheduleTeamId_weekScheduleFirstDay_date_timeSlot: {
-                weekScheduleTeamId: teamId,
-                weekScheduleFirstDay: weekSchedule.firstDay,
-                date:weekSchedule.appointments[0].date,
-                timeSlot:weekSchedule.appointments[0].timeSlot
+    const [appointmentResults, scheduleResult] = await Promise.all([
+        prisma.$transaction([...appointmentsQuery]),
+        prisma.weekSchedule.upsert({
+            where: {
+                teamId_firstDay: {
+                    teamId,
+                    firstDay:weekSchedule.firstDay
+                }
+            },
+            update: {
+                ...weekScheduleOnly
+            },
+            create: {
+                ...weekScheduleOnly
             }
-        },
-        update: {
-            ...weekSchedule.appointments[0]
-        },
-        create: {
-            ...weekSchedule.appointments[0]
-        }
-    })
+        })
+    ])
 
     return NextResponse.json("ok")
 }
