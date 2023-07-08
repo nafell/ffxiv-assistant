@@ -6,11 +6,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import DiscordLoginButton from '@/components/DiscordLoginButton';
 import { Appointment, TimeSlot, WeekSchedule } from '@prisma/client';
-import { WeekScheduleWithAppointments } from '../api/schedule/[id]/weekschedule/route';
+import { WeekScheduleInflated } from '../api/schedule/[id]/weekschedule/[firstDay]/route';
+import ScheduleTable from './_components/ScheduleTable';
 
 const schedulePage = () => {
     const { data: session } = useSession();
-    const [ auth, setAuth ] = useState(false);
+    const [ authorized, setAuthorized ] = useState(false);
     const [ guildName, setGuildName ] = useState("guild Name Here")
 
     const [ csvData, setCsvData ] = useState("data here")
@@ -38,7 +39,7 @@ const schedulePage = () => {
     const postWeekSchedule = async () => {
 
 
-        const w:WeekScheduleWithAppointments = {
+        const w:WeekScheduleInflated = {
             teamId:1,
             firstDay: new Date(2023,7,4),
             appointments: []
@@ -92,7 +93,7 @@ const schedulePage = () => {
     })
 
     const checkAuth = async () => {
-        if (auth == true) return;
+        if (authorized == true) return;
         if (!session || !session.user){
             return;
         }
@@ -107,7 +108,7 @@ const schedulePage = () => {
         if (res.status == 200)
         {
             setGuildName("ログイン成功")
-            setAuth(true)
+            setAuthorized(true)
         }
     }
 
@@ -116,13 +117,14 @@ const schedulePage = () => {
             <DiscordLoginButton></DiscordLoginButton>
             { (session && session.user) ? (
             <>
-                { auth ? (
+                { authorized ? (
                     <div className="flex flex-col items-center mb-4 lg:mb-12">
                         Conglaturations! You are a member of <b>{guildName}</b> and authorized.
                         <button onClick={getSpreadsheetInfo}>getSpreadsheetInfo</button>
                         <button onClick={getSheetsSchedule}>getSheetsSchedule</button>
                         <button onClick={postWeekSchedule}>postWeekSchedule</button>
                         <p>{csvData}</p>
+                        <ScheduleTable authorized={authorized}></ScheduleTable>
                     </div>
 
 

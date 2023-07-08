@@ -32,7 +32,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const weekSchedule = await prisma.weekSchedule.findFirst({
         where: {
             teamId,
-            firstDay: firstDayDate
+            firstDay: {
+                gte: firstDayDate
+            }
         },
         include: {
             appointments: true
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         );
     }
 
-    const weekSchedule:WeekScheduleWithAppointments =  await request.json()
+    const weekSchedule:WeekScheduleInflated =  await request.json()
     if (!weekSchedule){
         return new Response(JSON.stringify({
             error:"Include WeekSchedule as request body",
@@ -130,6 +132,6 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json("ok")
 }
 
-export interface WeekScheduleWithAppointments extends WeekSchedule {
+export interface WeekScheduleInflated extends WeekSchedule {
     appointments: Appointment[]
 }
