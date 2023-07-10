@@ -18,6 +18,8 @@ export async function isGuildMember(accessToken: string, guildId:string): Promis
         return guildName!
     }
     
+    console.log("discod:discord api error")
+    console.log(res)
     return null
 }
 
@@ -30,6 +32,7 @@ export async function isTeamMember(accessToken: string, teamId:number): Promise<
 
     if (!team)
     {
+        console.log("discod:no team in database")
         return false
     }
 
@@ -38,19 +41,24 @@ export async function isTeamMember(accessToken: string, teamId:number): Promise<
     if (guildName)
     {
         return true
-    } else return false
+    } else {
+        console.log("discod:user not member of team")
+        return false
+    }
 }
 
 export async function isDiscordGuildAuth(nextRequest: NextRequest, teamId: string) : Promise<boolean> {
 
     const teamIdInt = Number(teamId)
     if (Number.isNaN(teamIdInt)) {
+        console.log("discod:NaN")
         return false
     }
 
     const encrypted = nextRequest.headers.get("discordToken")
 
     if (!encrypted){
+        console.log("discod:no auth in header")
         return false
     }
 

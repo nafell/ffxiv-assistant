@@ -63,7 +63,7 @@ const ScheduleTable = ({ authorized } : { authorized: boolean }) => {
             }) 
         })
 
-        const schedules: WeekScheduleInflated[] = await response.json()
+        const schedules: WeekScheduleInflated[] = (response.status == 200) ? await response.json() : []
 
         setSchedules(schedules)
         setScheduleCount(schedules.length)
